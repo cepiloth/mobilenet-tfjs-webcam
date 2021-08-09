@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+	<title>Hand-written Shape Recognizer. Epoch 10 :)</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=yes"/>
+
+	<script src="https://sdk.amazonaws.com/js/aws-sdk-2.283.1.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.3.1/dist/tf.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8/dist/teachablemachine-image.min.js"></script>
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/billboard.js/dist/theme/datalab.min.css">
+	<script src="https://cdn.jsdelivr.net/npm/billboard.js/dist/billboard.pkgd.min.js"></script>
+	<script src="https://shape-algo.s3.ap-northeast-2.amazonaws.com/js/html2canvas.js"></script>
+	<script src="https://shape-algo.s3.ap-northeast-2.amazonaws.com/js/jquery-1.12.4.min.js"></script>
+	<script src="https://shape-algo.s3.ap-northeast-2.amazonaws.com/js/aws_interface.js"></script>
+	<script src="https://shape-algo.s3.ap-northeast-2.amazonaws.com/js/tensorflow_interface_epoch_10.js"></script>
+	<script src="https://shape-algo.s3.ap-northeast-2.amazonaws.com/js/paint_interface.js"></script>
+		
+	<script language = "javascript">
+		var imgArray = new Array();
+		var nameArray = new Array();
+		const IMGURL = "https://shape-algo.s3.ap-northeast-2.amazonaws.com/images/";
+		var imgCount = 0;
+		imgArray[imgCount++] = IMGURL + "b01[사각형]직사각형.jpg";
+		imgArray[imgCount++] = IMGURL + "b02[사각형]둥근모서리.jpg";
+		imgArray[imgCount++] = IMGURL + "b03[사각형]잘린한쪽모서리.jpg";
+		imgArray[imgCount++] = IMGURL + "b04[사각형]잘린위쪽모서리.jpg";
+		imgArray[imgCount++] = IMGURL + "b05[사각형]잘린대각선방향모서리.jpg";
+		imgArray[imgCount++] = IMGURL + "b06[사각형]위쪽모서리한쪽둥글고한쪽잘림.jpg";
+		imgArray[imgCount++] = IMGURL + "b07[사각형]둥근한쪽모서리.jpg";
+		imgArray[imgCount++] = IMGURL + "b08[사각형]둥근위쪽모서리.jpg";
+		imgArray[imgCount++] = IMGURL + "c03[기본도형]타원.jpg";
+		imgArray[imgCount++] = IMGURL + "c04[기본도형]이등변삼각형.jpg";
+		imgArray[imgCount++] = IMGURL + "c05[기본도형]직각삼각형.jpg";
+		imgArray[imgCount++] = IMGURL + "c06[기본도형]평형사변형.jpg";
+		imgArray[imgCount++] = IMGURL + "c07[기본도형]사다리꼴.jpg";
+		imgArray[imgCount++] = IMGURL + "c08[기본도형]다이아몬드.jpg";
+		imgArray[imgCount++] = IMGURL + "c09[기본도형]오각형.jpg";
+		imgArray[imgCount++] = IMGURL + "c10[기본도형]육각형.jpg";
+		imgArray[imgCount++] = IMGURL + "c11[기본도형]칠각형.jpg";
+		imgArray[imgCount++] = IMGURL + "c12[기본도형]팔각형.jpg";
+		imgArray[imgCount++] = IMGURL + "c15[기본도형]부분원형.jpg";
+		imgArray[imgCount++] = IMGURL + "c16[기본도형]현.jpg";
+		imgArray[imgCount++] = IMGURL + "c17[기본도형]눈물방울.jpg";
+		imgArray[imgCount++] = IMGURL + "c18[기본도형]액자.jpg";
+		imgArray[imgCount++] = IMGURL + "c19[기본도형]절반액자.jpg";
+		imgArray[imgCount++] = IMGURL + "c20[기본도형]L도형.jpg";
+		imgArray[imgCount++] = IMGURL + "c21[기본도형]대각선줄무늬.jpg";
+		imgArray[imgCount++] = IMGURL + "c22[기본도형]십자형.jpg";
+		imgArray[imgCount++] = IMGURL + "c23[기본도형]배지.jpg";
+		imgArray[imgCount++] = IMGURL + "c24[기본도형]원통형.jpg";
+		imgArray[imgCount++] = IMGURL + "c25[기본도형]정육면체.jpg";
+		imgArray[imgCount++] = IMGURL + "c26[기본도형]사각형_빗면.jpg";
+		imgArray[imgCount++] = IMGURL + "c27[기본도형]원형_비어있음.jpg";
+		imgArray[imgCount++] = IMGURL + "c28[기본도형]허용안됨기호.jpg";
+		imgArray[imgCount++] = IMGURL + "c29[기본도형]막힌원호.jpg";
+		imgArray[imgCount++] = IMGURL + "c30[기본도형]모서리접힌도형.jpg";
+		imgArray[imgCount++] = IMGURL + "c31[기본도형]웃는얼굴.jpg";
+		imgArray[imgCount++] = IMGURL + "c32[기본도형]하트.jpg";
+		imgArray[imgCount++] = IMGURL + "c33[기본도형]번개.jpg";
+		imgArray[imgCount++] = IMGURL + "c34[기본도형]해.jpg";
+		imgArray[imgCount++] = IMGURL + "c35[기본도형]달.jpg";
+		imgArray[imgCount++] = IMGURL + "c36[기본도형]구름.jpg";
+		imgArray[imgCount++] = IMGURL + "d01[블록화살표]오른쪽.jpg";
+		imgArray[imgCount++] = IMGURL + "d02[블록화살표]왼쪽.jpg";
+		imgArray[imgCount++] = IMGURL + "d03[블록화살표]위쪽.jpg";
+		imgArray[imgCount++] = IMGURL + "d04[블록화살표]아래쪽.jpg";
+		imgArray[imgCount++] = IMGURL + "d05[블록화살표]왼쪽오른쪽.jpg";
+		imgArray[imgCount++] = IMGURL + "d06[블록화살표]위쪽아래쪽.jpg";
+		imgArray[imgCount++] = IMGURL + "d07[블록화살표]왼쪽오른쪽위쪽아래쪽.jpg";
+		imgArray[imgCount++] = IMGURL + "d08[블록화살표]왼쪽오른쪽위쪽.jpg";
+		imgArray[imgCount++] = IMGURL + "d09[블록화살표]굽음.jpg";
+		imgArray[imgCount++] = IMGURL + "d10[블록화살표]U자형.jpg";
+		imgArray[imgCount++] = IMGURL + "d11[블록화살표]왼쪽위쪽.jpg";
+		imgArray[imgCount++] = IMGURL + "d12[블록화살표]위로굽음.jpg";
+		imgArray[imgCount++] = IMGURL + "d17[블록화살표]줄무늬가있는오른쪽.jpg";
+		imgArray[imgCount++] = IMGURL + "d18[블록화살표]톱니모양의오른쪽.jpg";
+		imgArray[imgCount++] = IMGURL + "d19[블록화살표]오각형.jpg";
+		imgArray[imgCount++] = IMGURL + "d20[블록화살표]갈매기형수장.jpg";
+		imgArray[imgCount++] = IMGURL + "d21[블록화살표]설명선_오른쪽화살표.jpg";
+		imgArray[imgCount++] = IMGURL + "d22[블록화살표]설명선_아래쪽화살표.jpg";
+		imgArray[imgCount++] = IMGURL + "d23[블록화살표]설명선_왼쪽화살표.jpg";
+		imgArray[imgCount++] = IMGURL + "d24[블록화살표]설명선_위쪽화살표.jpg";
+		imgArray[imgCount++] = IMGURL + "d25[블록화살표]설명선_왼쪽오른쪽화살표.jpg";
+		imgArray[imgCount++] = IMGURL + "d26[블록화살표]설명선_왼쪽오른쪽위쪽아래쪽화살표.jpg";
+		imgArray[imgCount++] = IMGURL + "d27[블록화살표]원형.jpg";
+		imgArray[imgCount++] = IMGURL + "e01[수식도형]더하기기호.jpg";
+		imgArray[imgCount++] = IMGURL + "e02[수식도형]빼기기호.jpg";
+		imgArray[imgCount++] = IMGURL + "e03[수식도형]곱하기기호.jpg";
+		imgArray[imgCount++] = IMGURL + "e04[수식도형]나누기기호.jpg";
+		imgArray[imgCount++] = IMGURL + "e05[수식도형]같음기호.jpg";
+		imgArray[imgCount++] = IMGURL + "e06[수식도형]부등호.jpg";
+		imgArray[imgCount++] = IMGURL + "f05[순서도]종속처리.jpg";
+		imgArray[imgCount++] = IMGURL + "f06[순서도]내부저장소.jpg";
+		imgArray[imgCount++] = IMGURL + "f07[순서도]문서.jpg";
+		imgArray[imgCount++] = IMGURL + "f08[순서도]다중문서.jpg";
+		imgArray[imgCount++] = IMGURL + "f09[순서도]수행의_시작종료.jpg";
+		imgArray[imgCount++] = IMGURL + "f11[순서도]수동입력.jpg";
+		imgArray[imgCount++] = IMGURL + "f12[순서도]수동연산.jpg";
+		imgArray[imgCount++] = IMGURL + "f14[순서도]다른페이지연결선.jpg";
+		imgArray[imgCount++] = IMGURL + "f17[순서도]가산접합.jpg";
+		imgArray[imgCount++] = IMGURL + "f18[순서도]논리합.jpg";
+		imgArray[imgCount++] = IMGURL + "f19[순서도]대조.jpg";
+		imgArray[imgCount++] = IMGURL + "f20[순서도]분류.jpg";
+		imgArray[imgCount++] = IMGURL + "f22[순서도]병합.jpg";
+		imgArray[imgCount++] = IMGURL + "f23[순서도]저장데이터.jpg";
+		imgArray[imgCount++] = IMGURL + "f24[순서도]지연.jpg";
+		imgArray[imgCount++] = IMGURL + "f25[순서도]순차적액세스저장소.jpg";
+		imgArray[imgCount++] = IMGURL + "f27[순서도]직접액세스저장소.jpg";
+		imgArray[imgCount++] = IMGURL + "f28[순서도]화면표시.jpg";
+		imgArray[imgCount++] = IMGURL + "g01[별_및_현수막]폭발_8pt.jpg";
+		imgArray[imgCount++] = IMGURL + "g03[별_및_현수막]꼭지점_4개.jpg";
+		imgArray[imgCount++] = IMGURL + "g04[별_및_현수막]꼭지점_5개.jpg";
+		imgArray[imgCount++] = IMGURL + "g05[별_및_현수막]꼭지점_6개.jpg";
+		imgArray[imgCount++] = IMGURL + "g19[별_및_현수막]물결.jpg";
+		imgArray[imgCount++] = IMGURL + "g20[별_및_현수막]이중물결.jpg";
+		imgArray[imgCount++] = IMGURL + "h01[설명선]말풍선_사각형.jpg";
+		imgArray[imgCount++] = IMGURL + "h02[설명선]말풍선_둥근사각형.jpg";
+		imgArray[imgCount++] = IMGURL + "h03[설명선]말풍선_타원형.jpg";
+		imgArray[imgCount++] = IMGURL + "h04[설명선]생각풍선_구름모양.jpg";
+		imgArray[imgCount++] = IMGURL + "i01[실행단추]뒤로또는앞으로이동.jpg";
+		imgArray[imgCount++] = IMGURL + "i02[실행단추]앞으로또는다음으로이동.jpg";
+		imgArray[imgCount++] = IMGURL + "i03[실행단추]처음으로이동.jpg";
+		imgArray[imgCount++] = IMGURL + "i04[실행단추]끝으로이동.jpg";
+		imgArray[imgCount++] = IMGURL + "i05[실행단추]홈으로이동.jpg";
+		imgArray[imgCount++] = IMGURL + "i06[실행단추]정보가져오기.jpg";
+		imgArray[imgCount++] = IMGURL + "i07[실행단추]돌아오기.jpg";
+		imgArray[imgCount++] = IMGURL + "i08[실행단추]동영상.jpg";
+		imgArray[imgCount++] = IMGURL + "i09[실행단추]문서.jpg";
+		imgArray[imgCount++] = IMGURL + "i10[실행단추]소리.jpg";
+		imgArray[imgCount++] = IMGURL + "i11[실행단추]도움말.jpg";
+		
+		var imgCount = 0;
+		nameArray[imgCount++] = "b01[사각형]직사각형.jpg";
+		nameArray[imgCount++] = "b02[사각형]둥근모서리.jpg";
+		nameArray[imgCount++] = "b03[사각형]잘린한쪽모서리.jpg";
+		nameArray[imgCount++] = "b04[사각형]잘린위쪽모서리.jpg";
+		nameArray[imgCount++] = "b05[사각형]잘린대각선방향모서리.jpg";
+		nameArray[imgCount++] = "b06[사각형]위쪽모서리한쪽둥글고한쪽잘림.jpg";
+		nameArray[imgCount++] = "b07[사각형]둥근한쪽모서리.jpg";
+		nameArray[imgCount++] = "b08[사각형]둥근위쪽모서리.jpg";
+		nameArray[imgCount++] = "c03[기본도형]타원.jpg";
+		nameArray[imgCount++] = "c04[기본도형]이등변삼각형.jpg";
+		nameArray[imgCount++] = "c05[기본도형]직각삼각형.jpg";
+		nameArray[imgCount++] = "c06[기본도형]평형사변형.jpg";
+		nameArray[imgCount++] = "c07[기본도형]사다리꼴.jpg";
+		nameArray[imgCount++] = "c08[기본도형]다이아몬드.jpg";
+		nameArray[imgCount++] = "c09[기본도형]오각형.jpg";
+		nameArray[imgCount++] = "c10[기본도형]육각형.jpg";
+		nameArray[imgCount++] = "c11[기본도형]칠각형.jpg";
+		nameArray[imgCount++] = "c12[기본도형]팔각형.jpg";
+		nameArray[imgCount++] = "c15[기본도형]부분원형.jpg";
+		nameArray[imgCount++] = "c16[기본도형]현.jpg";
+		nameArray[imgCount++] = "c17[기본도형]눈물방울.jpg";
+		nameArray[imgCount++] = "c18[기본도형]액자.jpg";
+		nameArray[imgCount++] = "c19[기본도형]절반액자.jpg";
+		nameArray[imgCount++] = "c20[기본도형]L도형.jpg";
+		nameArray[imgCount++] = "c21[기본도형]대각선줄무늬.jpg";
+		nameArray[imgCount++] = "c22[기본도형]십자형.jpg";
+		nameArray[imgCount++] = "c23[기본도형]배지.jpg";
+		nameArray[imgCount++] = "c24[기본도형]원통형.jpg";
+		nameArray[imgCount++] = "c25[기본도형]정육면체.jpg";
+		nameArray[imgCount++] = "c26[기본도형]사각형_빗면.jpg";
+		nameArray[imgCount++] = "c27[기본도형]원형_비어있음.jpg";
+		nameArray[imgCount++] = "c28[기본도형]허용안됨기호.jpg";
+		nameArray[imgCount++] = "c29[기본도형]막힌원호.jpg";
+		nameArray[imgCount++] = "c30[기본도형]모서리접힌도형.jpg";
+		nameArray[imgCount++] = "c31[기본도형]웃는얼굴.jpg";
+		nameArray[imgCount++] = "c32[기본도형]하트.jpg";
+		nameArray[imgCount++] = "c33[기본도형]번개.jpg";
+		nameArray[imgCount++] = "c34[기본도형]해.jpg";
+		nameArray[imgCount++] = "c35[기본도형]달.jpg";
+		nameArray[imgCount++] = "c36[기본도형]구름.jpg";
+		nameArray[imgCount++] = "d01[블록화살표]오른쪽.jpg";
+		nameArray[imgCount++] = "d02[블록화살표]왼쪽.jpg";
+		nameArray[imgCount++] = "d03[블록화살표]위쪽.jpg";
+		nameArray[imgCount++] = "d04[블록화살표]아래쪽.jpg";
+		nameArray[imgCount++] = "d05[블록화살표]왼쪽오른쪽.jpg";
+		nameArray[imgCount++] = "d06[블록화살표]위쪽아래쪽.jpg";
+		nameArray[imgCount++] = "d07[블록화살표]왼쪽오른쪽위쪽아래쪽.jpg";
+		nameArray[imgCount++] = "d08[블록화살표]왼쪽오른쪽위쪽.jpg";
+		nameArray[imgCount++] = "d09[블록화살표]굽음.jpg";
+		nameArray[imgCount++] = "d10[블록화살표]U자형.jpg";
+		nameArray[imgCount++] = "d11[블록화살표]왼쪽위쪽.jpg";
+		nameArray[imgCount++] = "d12[블록화살표]위로굽음.jpg";
+		nameArray[imgCount++] = "d17[블록화살표]줄무늬가있는오른쪽.jpg";
+		nameArray[imgCount++] = "d18[블록화살표]톱니모양의오른쪽.jpg";
+		nameArray[imgCount++] = "d19[블록화살표]오각형.jpg";
+		nameArray[imgCount++] = "d20[블록화살표]갈매기형수장.jpg";
+		nameArray[imgCount++] = "d21[블록화살표]설명선_오른쪽화살표.jpg";
+		nameArray[imgCount++] = "d22[블록화살표]설명선_아래쪽화살표.jpg";
+		nameArray[imgCount++] = "d23[블록화살표]설명선_왼쪽화살표.jpg";
+		nameArray[imgCount++] = "d24[블록화살표]설명선_위쪽화살표.jpg";
+		nameArray[imgCount++] = "d25[블록화살표]설명선_왼쪽오른쪽화살표.jpg";
+		nameArray[imgCount++] = "d26[블록화살표]설명선_왼쪽오른쪽위쪽아래쪽화살표.jpg";
+		nameArray[imgCount++] = "d27[블록화살표]원형.jpg";
+		nameArray[imgCount++] = "e01[수식도형]더하기기호.jpg";
+		nameArray[imgCount++] = "e02[수식도형]빼기기호.jpg";
+		nameArray[imgCount++] = "e03[수식도형]곱하기기호.jpg";
+		nameArray[imgCount++] = "e04[수식도형]나누기기호.jpg";
+		nameArray[imgCount++] = "e05[수식도형]같음기호.jpg";
+		nameArray[imgCount++] = "e06[수식도형]부등호.jpg";
+		nameArray[imgCount++] = "f05[순서도]종속처리.jpg";
+		nameArray[imgCount++] = "f06[순서도]내부저장소.jpg";
+		nameArray[imgCount++] = "f07[순서도]문서.jpg";
+		nameArray[imgCount++] = "f08[순서도]다중문서.jpg";
+		nameArray[imgCount++] = "f09[순서도]수행의_시작종료.jpg";
+		nameArray[imgCount++] = "f11[순서도]수동입력.jpg";
+		nameArray[imgCount++] = "f12[순서도]수동연산.jpg";
+		nameArray[imgCount++] = "f14[순서도]다른페이지연결선.jpg";
+		nameArray[imgCount++] = "f17[순서도]가산접합.jpg";
+		nameArray[imgCount++] = "f18[순서도]논리합.jpg";
+		nameArray[imgCount++] = "f19[순서도]대조.jpg";
+		nameArray[imgCount++] = "f20[순서도]분류.jpg";
+		nameArray[imgCount++] = "f22[순서도]병합.jpg";
+		nameArray[imgCount++] = "f23[순서도]저장데이터.jpg";
+		nameArray[imgCount++] = "f24[순서도]지연.jpg";
+		nameArray[imgCount++] = "f25[순서도]순차적액세스저장소.jpg";
+		nameArray[imgCount++] = "f27[순서도]직접액세스저장소.jpg";
+		nameArray[imgCount++] = "f28[순서도]화면표시.jpg";
+		nameArray[imgCount++] = "g01[별_및_현수막]폭발_8pt.jpg";
+		nameArray[imgCount++] = "g03[별_및_현수막]꼭지점_4개.jpg";
+		nameArray[imgCount++] = "g04[별_및_현수막]꼭지점_5개.jpg";
+		nameArray[imgCount++] = "g05[별_및_현수막]꼭지점_6개.jpg";
+		nameArray[imgCount++] = "g19[별_및_현수막]물결.jpg";
+		nameArray[imgCount++] = "g20[별_및_현수막]이중물결.jpg";
+		nameArray[imgCount++] = "h01[설명선]말풍선_사각형.jpg";
+		nameArray[imgCount++] = "h02[설명선]말풍선_둥근사각형.jpg";
+		nameArray[imgCount++] = "h03[설명선]말풍선_타원형.jpg";
+		nameArray[imgCount++] = "h04[설명선]생각풍선_구름모양.jpg";
+		nameArray[imgCount++] = "i01[실행단추]뒤로또는앞으로이동.jpg";
+		nameArray[imgCount++] = "i02[실행단추]앞으로또는다음으로이동.jpg";
+		nameArray[imgCount++] = "i03[실행단추]처음으로이동.jpg";
+		nameArray[imgCount++] = "i04[실행단추]끝으로이동.jpg";
+		nameArray[imgCount++] = "i05[실행단추]홈으로이동.jpg";
+		nameArray[imgCount++] = "i06[실행단추]정보가져오기.jpg";
+		nameArray[imgCount++] = "i07[실행단추]돌아오기.jpg";
+		nameArray[imgCount++] = "i08[실행단추]동영상.jpg";
+		nameArray[imgCount++] = "i09[실행단추]문서.jpg";
+		nameArray[imgCount++] = "i10[실행단추]소리.jpg";
+		nameArray[imgCount++] = "i11[실행단추]도움말.jpg";
+		
+		function showImage(){
+			var imgNum = Math.round(Math.random()*107);
+			var objImg = document.getElementById("introImg");
+			objImg.src = imgArray[imgNum];
+			console.log(imgNum);
+			console.log(imgArray[imgNum]);
+			
+			var element = document.getElementById("imgDiv");
+			element.innerText = nameArray[imgNum];
+		}
+		
+		function onLoad() {
+			var canvas = document.getElementById('drawCanvas');
+			var ctx = canvas.getContext('2d');
+			ctx.fillStyle = 'rgb(255, 255, 255)';
+			ctx.fillRect(0, 0, canvas.width, canvas.height);
+			init();
+			showImage();
+		}
+		
+		function onClear() {
+			showImage();
+			var ctx = drawCanvas.getContext('2d');
+			ctx.clearRect(0, 0, drawCanvas.width, drawCanvas.height);
+			ctx.beginPath();
+			localStorage.removeItem('imgCanvas');
+			ctx.fillStyle = 'rgb(255, 255, 255)';
+			ctx.fillRect(0, 0, drawCanvas.width, drawCanvas.height);
+			
+			var elem_img = document.getElementById("userImg");
+			elem_img.src = "https://shape-algo.s3.ap-northeast-2.amazonaws.com/images/blank.jpg";
+			
+			const elem_text_div = document.getElementById('userImgDiv');
+			elem_div.innerText = jbAry[cand_index]+".jpg";
+		}
+		
+		function onSaveHtml() {
+			var container = document.body;
+			html2canvas(container).then(canvas => {
+				var element = document.createElement('a');
+
+				element.download = 'errorpage.jpeg';
+				element.target = '_blank';
+				element.href = canvas.toDataURL();
+				element.click();                
+			});
+		}
+	</script>
+	
+	<style>
+		img { border: 0; }
+        *{
+            text-align: center;
+            
+        }
+		.button {
+			border: none;
+			color: black;
+			padding: 15px 15px;
+			text-align: center;
+			text-decoration: none;
+			display: inline-block;
+			font-size: 13px;
+			margin: 4px 2px;
+			cursor: pointer;
+		}
+		.container {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			/* display: inline-flex; */
+		}
+    </style>
+</head>
+
+<body onLoad="onLoad()">
+	<h1>Hand-written Shape Recognizer. Epoch 10:)</h1>	
+	
+	<div>
+		<div class="container">
+			<div class="item" width="300" height="300">
+				<img id ="introImg" border="0" onclick="onClear()" style="cursor: pointer;" width="300" height="300">
+				<h3 id="imgDiv" class="item" >" "</h3>
+			</div>
+			<div class="item" width="30" height="330">
+				<img id ="userImg" src="https://shape-algo.s3.ap-northeast-2.amazonaws.com/images/blank.jpg" border="0"  width="300" height="300">
+				<h3 id="userImgDiv" class="item" >" "</h3>
+			</div>
+		</div>
+	</div>			
+
+	<div class="container">
+		<div class="item" width="400" height="400">
+			<canvas id="drawCanvas" 
+				width="400" 
+				height="400" 
+				style="border:1px solid #000000;"> 
+				Canvas not supported 
+			</canvas>
+		</div>
+		<div class="item">
+			<div id="pieChart" class="left" width="448" height="448" ></div>
+		</div>
+	</div>
+	
+	<br>
+	<div >
+		<button id="btnPrev" class="button">Undo</button>
+		<button id="btnClea" class="button">Clear</button>			
+		<button id="btnAi" class="button" onclick="onClear()">Shape Change</button>
+		<button class="button" onclick="onSaveHtml()">Print Screen</button>
+		
+	</div>
+	
+	<br>
+	<div >
+		<center>
+		<h3>COPYRIGHT © 2021, C4BIG2 & CEPILOTH ALL RIGHTS RESERVED.</h3>
+		</center>
+	
+</body>
+</html>
